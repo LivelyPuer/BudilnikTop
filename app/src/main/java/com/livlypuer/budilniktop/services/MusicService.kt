@@ -19,9 +19,9 @@ class MusicService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
+
         return START_STICKY
     }
-
     override fun onCreate() {
         super.onCreate()
         val CHANNEL_ID = "my_channel_01"
@@ -40,7 +40,9 @@ class MusicService : Service() {
             .setContentTitle("Активный").build()
 
         startForeground(1, notification)
-
+        mediaPlayer = MediaPlayer.create(applicationContext, R.raw.music)
+        mediaPlayer.start()
+        mediaPlayer.isLooping = true
     }
     override fun onDestroy() {
         mediaPlayer.stop();

@@ -3,6 +3,7 @@ package com.livlypuer.budilniktop.bdKotlin
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
@@ -10,7 +11,9 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.*
 import java.util.function.BinaryOperator
+import kotlin.collections.ArrayList
 
 class DBManager(context: Context?) {
     private val mDataBase: SQLiteDatabase
@@ -75,6 +78,45 @@ class DBManager(context: Context?) {
         )
         return mCursor.count != 0
     }
+    fun nextBudilnik(): TimeModel?{
+        var timeMinutes = LocalTime.now().minute + LocalTime.now().hour * 60;
+        val mCalendar = Calendar.getInstance()
+        var day_of_week = mCalendar[Calendar.DAY_OF_WEEK]
+//        if (day_of_week == 0){
+//            day_of_week = 6;
+//        }else{
+//            day_of_week -= 1
+//        }
+        Log.d("MY", day_of_week.toString())
+        val mCursor: Cursor;
+        when(day_of_week) {
+            2 -> mCursor = mDataBase.query(TABLE_NAME_TIMES, null, COLUMN_MONDAY + " = ?", arrayOf("1"), null, null, null)
+            3 -> mCursor = mDataBase.query(TABLE_NAME_TIMES, null, COLUMN_TUESDAY + " = ?", arrayOf("1"), null, null, null)
+            4 -> mCursor = mDataBase.query(TABLE_NAME_TIMES, null, COLUMN_WEDNESDAY + " = ?", arrayOf("1"), null, null, null)
+            5 -> mCursor = mDataBase.query(TABLE_NAME_TIMES, null, COLUMN_THURSDAY + " = ?", arrayOf("1"), null, null, null)
+            6 -> mCursor = mDataBase.query(TABLE_NAME_TIMES, null, COLUMN_FRIDAY + " = ?", arrayOf("1"), null, null, null)
+            7 -> mCursor = mDataBase.query(TABLE_NAME_TIMES, null, COLUMN_SATURDAY + " = ?", arrayOf("1"), null, null, null)
+            1 -> mCursor = mDataBase.query(TABLE_NAME_TIMES, null, COLUMN_SUNDAY + " = ?", arrayOf("1"), null, null, null)
+            else -> {mCursor = mDataBase.query(TABLE_NAME_TIMES, null, null, null, null, null, null)}
+        }
+        mCursor.moveToFirst()
+        var min = TimeModel(null, LocalTime.MAX)
+        if (!mCursor.isAfterLast) {
+            do {
+                val timeTmp = selectTime(mCursor.getLong(NUM_COLUMN_TIME_ID))
+                val minutesTmp = timeTmp.time.hour * 60 + timeTmp.time.minute;
+                Log.d("MY", minutesTmp.toString() + " " + min.time.hour * 60 + min.time.minute)
+                if (timeMinutes < minutesTmp && minutesTmp < min.time.hour * 60 + min.time.minute){
+                    min = timeTmp
+                }
+            } while (mCursor.moveToNext())
+        }
+        if (min.id == null){
+            return null
+        }
+        return min
+    }
+
 
     fun fullExistTimes(time: TimeModel): Boolean {
         val mCursor = mDataBase.query(
@@ -113,7 +155,6 @@ class DBManager(context: Context?) {
         }
 
     }
-
     fun updateTime(time: TimeModel): Long {
         val cv = ContentValues()
         val weeks = time.weeks

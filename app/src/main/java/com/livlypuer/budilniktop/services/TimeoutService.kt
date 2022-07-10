@@ -1,5 +1,6 @@
 package com.livlypuer.budilniktop.services
 
+import com.livlypuer.budilniktop.R
 import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -14,9 +15,8 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import com.livlypuer.budilniktop.MainActivity
-import com.livlypuer.budilniktop.R
+import com.livlypuer.budilniktop.QuizeActivity
 import com.livlypuer.budilniktop.bdKotlin.DBManager
-import java.text.SimpleDateFormat
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -44,8 +44,6 @@ class TimeoutService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        mediaPlayer = MediaPlayer.create(applicationContext, R.raw.music)
-        val CHANNEL_ID = "my_channel_01"
         val channel = NotificationChannel(
             CHANNEL_ID,
             "Channel human readable title",
@@ -60,7 +58,16 @@ class TimeoutService : Service() {
             .setContentText("Супер-пупер будильник")
             .setContentTitle("Активный").build()
 
+
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
+        val channel1 = NotificationChannel(CHANNEL_ID, "Budilnik", importance)
+        val notificationManager = getSystemService(
+            NotificationManager::class.java
+        )
+        notificationManager.createNotificationChannel(channel1)
+
         startForeground(1, notification)
+
         mDBConnector = DBManager(this)
         TimerService()
 
@@ -95,41 +102,51 @@ class TimeoutService : Service() {
                     min = current.minute
                     val mCalendar = Calendar.getInstance()
                     var day_week = mCalendar[Calendar.DAY_OF_WEEK]
-                    if (day_week == 0){
+                    if (day_week == 1) {
                         day_week = 6;
-                    }else{
+                    } else {
                         day_week -= 1
                     }
+                    Log.d("MY", day_week.toString())
                     val formatter = DateTimeFormatter.ofPattern("H:m")
                     val formatted = current.format(formatter)
 
                     if (mDBConnector!!.existTimes(formatted) && mDBConnector!!.selectTime(formatted).weeks[day_week] == true) {
-                        val notificationIntent =
-                            Intent(applicationContext, MainActivity::class.java)
-                        val pendingIntent = PendingIntent.getActivity(
-                            applicationContext,
-                            0, notificationIntent,
-                            PendingIntent.FLAG_IMMUTABLE
-                        )
-                        val notificationBuilder: NotificationCompat.Builder =
-                            NotificationCompat.Builder(applicationContext, MainActivity.CHANNEL_ID)
-                                .setSmallIcon(R.drawable.clock)
-                                .setContentText("Супер-пупер будильник")
-                                .setContentTitle(current.format(DateTimeFormatter.ofPattern("HH:mm")))
-                                .addAction(R.drawable.cross_svgrepo_com, "Отключить", pendingIntent)
-                                .setAutoCancel(true)
+                        if (!mDBConnector!!.selectTime(formatted).active) {
+                            var t = mDBConnector!!.selectTime(formatted)
+                            t.active = true
+                            mDBConnector!!.updateTime(t);
+                        } else {
+                            val notificationIntent =
+                                Intent(applicationContext, QuizeActivity::class.java)
+                            val pendingIntent = PendingIntent.getActivity(
+                                applicationContext,
+                                0, notificationIntent,
+                                PendingIntent.FLAG_IMMUTABLE
+                            )
 
-                        val notificationManager =
-                            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                            val notificationBuilder: NotificationCompat.Builder =
+                                NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+                                    .setSmallIcon(R.drawable.clock)
+                                    .setContentText("Супер-пупер будильник")
+                                    .setContentTitle(current.format(DateTimeFormatter.ofPattern("HH:mm")))
+                                    .addAction(R.drawable.clock, "Отключить", pendingIntent)
+                                    .setAutoCancel(true)
+                                    .setContentIntent(pendingIntent)
 
-                        notificationManager.notify(
-                            MainActivity.NOTIFICATION_ID,
-                            notificationBuilder.build()
-                        )
-                        val mediaPlayer = MediaPlayer.create(applicationContext, R.raw.music)
-                        mediaPlayer.start()
-                        mediaPlayer.isLooping = true;
-                        Toast.makeText(applicationContext, "Notify", Toast.LENGTH_SHORT).show()
+                            val notificationManager =
+                                getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+
+                            notificationManager.notify(
+                                MainActivity.NOTIFICATION_ID,
+                                notificationBuilder.build()
+                            )
+
+                            startService(Intent(applicationContext, MusicService::class.java))
+
+                            Toast.makeText(applicationContext, "Notify", Toast.LENGTH_SHORT).show()
+                        }
+
                     } else {
 
                     }

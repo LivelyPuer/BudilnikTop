@@ -9,7 +9,12 @@
       <map>
         <entry key="..\:/Downloads/app/BudilnikTop/app/src/main/res/drawable/clock.xml" value="0.196" />
         <entry key="..\:/Downloads/app/BudilnikTop/app/src/main/res/drawable/cross.xml" value="0.196" />
+        <entry key="..\:/Downloads/app/BudilnikTop/app/src/main/res/drawable/refresh_svgrepo_com.xml" value="0.2145" />
+        <entry key="..\:/Downloads/app/BudilnikTop/app/src/main/res/layout/activity_quize.xml" value="0.10364583333333334" />
+        <entry key="..\:/Downloads/app/BudilnikTop/app/src/main/res/layout/water_widget_loading.xml" value="0.9840116279069767" />
+        <entry key="..\:/Downloads/app/BudilnikTop/app/src/main/res/layout/water_widget_preview.xml" value="0.67" />
         <entry key="..\:/Downloads/app/BudilnikTop/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.247" />
+        <entry key="..\:/Downloads/app/BudilnikTop/app/src/main/res/xml/widget_hello_world_info.xml" value="0.18802083333333333" />
       </map>
     </option>
   </component>

@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">BudilnikTop</string>
+    <string name="example_appwidget_description">Виджет для супер-пупер Будильника </string>
+    <string name="glasses_of_water_preview">Мой будильник</string>
+    <string name="goal_met">Следующий будильник 12:00</string>
+    <string name="loading">Грузим будильник</string>
+    <string name="nextBudilnik">"Следующий будильник: "</string>
 </resources>

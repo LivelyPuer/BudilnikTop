@@ -1,7 +1,9 @@
 package com.livlypuer.budilniktop
 
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -13,7 +15,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.livlypuer.budilniktop.bdKotlin.DBManager
 import com.livlypuer.budilniktop.bdKotlin.TimeModel
+import com.livlypuer.budilniktop.services.MusicService
 import com.livlypuer.budilniktop.services.TimeoutService
 import java.util.*
 
@@ -31,19 +35,18 @@ class MainActivity : ComponentActivity() {
         const val NOTIFICATION_ID = 101
         const val CHANNEL_ID = "channelID"
     }
+
     lateinit var saverTimes: SaverTimes;
     var mDBConnector: DBManager? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         InitializationParams()
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(NOTIFICATION_ID)
         setContent { MainContent() }
-        if (TimeoutService.mediaPlayer != null){
-            Log.d("MY", "STOPED")
-            TimeoutService.mediaPlayer!!.isLooping = false
-            TimeoutService.mediaPlayer!!.pause()
-            TimeoutService.mediaPlayer!!.stop()
-            TimeoutService.mediaPlayer!!.release()
-        }
+
         val mService = startService(Intent(this, TimeoutService::class.java))
     }
 
@@ -55,7 +58,9 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         saverTimes.updateTimesList();
+
     }
+
     @Composable
     fun MainContent() {
         Scaffold(
@@ -68,6 +73,7 @@ class MainActivity : ComponentActivity() {
             content = { MyContent() }
         )
     }
+
     @Composable
     fun MyContent() {
         Column(
@@ -78,7 +84,14 @@ class MainActivity : ComponentActivity() {
             ) {
             Header()
             Button(
-                onClick = {startActivity(Intent(this@MainActivity, CreateBudilnicActivity::class.java)) },
+                onClick = {
+                    startActivity(
+                        Intent(
+                            this@MainActivity,
+                            CreateBudilnicActivity::class.java
+                        )
+                    )
+                },
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color(0XFF0F9D58))
             ) {
                 Text(text = "Добавить будильник", color = Color.White)
@@ -94,7 +107,7 @@ class MainActivity : ComponentActivity() {
     fun ListWithHeader() {
 
         LazyColumn(state = rememberLazyListState()) {
-            stickyHeader{
+            stickyHeader {
                 StickyHeaderTimeLine()
             }
             items(saverTimes.timesList) { time ->
@@ -108,11 +121,15 @@ class MainActivity : ComponentActivity() {
         Spacer(modifier = Modifier.size(20.dp))
 
     }
+
     @Composable
-    fun StickyHeaderTimeLine(){
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .background(Color(144, 238, 144, 255)), horizontalArrangement = Arrangement.SpaceAround) {
+    fun StickyHeaderTimeLine() {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(144, 238, 144, 255)),
+            horizontalArrangement = Arrangement.SpaceAround
+        ) {
             Text(text = "Время", fontSize = 20.sp);
             Text(text = "Пн", fontSize = 15.sp)
             Text(text = "Вт", fontSize = 15.sp)
@@ -131,6 +148,8 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun TimeLine(time: TimeModel) {
+        var active by remember { mutableStateOf(false) }
+        active = time.active
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
             Text(text = time.niceStringTime, fontSize = 30.sp);
             Text(text = if (time.weeks[0] == true) "✅" else "❌", fontSize = 20.sp)
@@ -141,21 +160,25 @@ class MainActivity : ComponentActivity() {
             Text(text = if (time.weeks[5] == true) "✅" else "❌", fontSize = 20.sp)
             Text(text = if (time.weeks[6] == true) "✅" else "❌", fontSize = 20.sp)
             Button(
-                onClick = { },
-                colors = ButtonDefaults.buttonColors(backgroundColor = if (time.active) Color(0XFF0F9D58) else Color(
-                    0xFFA2A2A2
-                )
+                onClick = {
+                    active = !time.active
+                    time.active = active
+                    mDBConnector!!.updateTime(time)
+                },
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = if (active) Color(0XFF0F9D58) else Color(
+                        0xFFA2A2A2
+                    )
                 )
             ) {
                 Text(
-                    text = if (time.active) " Включен  " else "Выключен",
+                    text = if (active) " Включен  " else "Выключен",
                     color = Color.White
                 )
             }
 
         }
         Spacer(modifier = Modifier.size(10.dp))
-
     }
 
     @Preview(showBackground = true)
