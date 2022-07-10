@@ -29,7 +29,7 @@ Spesial для __ВЕЗДЕКОД ФИНАЛ__ 2022 год
 
 ![photo_2022-07-10_21-37-19](https://user-images.githubusercontent.com/50915106/178156230-9682bfa7-5952-4e8b-80e4-a4266a8ba190.jpg)
 
-##Видеодемонстрация работы приложения
+## Видеодемонстрация работы приложения
 
 Работоспособность будильника https://youtube.com/shorts/4Z2eoY0jDYI?feature=share
 
