@@ -1,4 +1,5 @@
 package com.livlypuer.budilniktop.widget
+
 import com.livlypuer.budilniktop.R
 import android.content.Context
 import android.content.Intent
@@ -12,6 +13,7 @@ import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.glance.*
+import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
@@ -38,7 +40,7 @@ class BudilnikWidget : GlanceAppWidget() {
         mDBConnector = DBManager(context)
         val nextTimes = mDBConnector!!.nextBudilnik()
         var outTime = "Сегодня нет"
-        if (nextTimes != null){
+        if (nextTimes != null) {
             outTime = nextTimes.niceStringTime
         }
         Column(
@@ -46,6 +48,8 @@ class BudilnikWidget : GlanceAppWidget() {
                 .fillMaxSize()
                 .background(
                     Color.Blue,
+                ).clickable(
+                    onClick = actionStartActivity<MainActivity>()
                 ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -85,6 +89,7 @@ class BudilnikWidget : GlanceAppWidget() {
 
 
     }
+
     @Composable
     fun ButtonRefresh(
 
