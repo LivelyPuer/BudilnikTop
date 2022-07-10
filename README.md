@@ -1,11 +1,35 @@
 # BudilnikTop
+Spesial для __ВЕЗДЕКОД ФИНАЛ__ 2022 год
 Отличное приложение для менеджмента своего драгоценного времени.
 
-1. возможность добавлять будильники с выбором дней недили или каждый день
+1. Возможность добавлять будильники с выбором дней недили или каждый день
 
 
-https://github.com/LivelyPuer/BudilnikTop/blob/master/Preview/ezgif-5-a787c26726.gif
-[![Watch the video](https://img.youtube.com/vi/T-D1KVIuvjA/maxresdefault.jpg)](https://youtu.be/T-D1KVIuvjA)
-https://user-images.githubusercontent.com/50915106/178154702-33cf6829-7fb6-43e7-8d71-e7f902d09ccb.mp4
+![photo_2022-07-10_21-37-18](https://user-images.githubusercontent.com/50915106/178155900-ba043407-4b22-4c68-94cf-1c149e9a997e.jpg)
+![photo_2022-07-10_21-37-21](https://user-images.githubusercontent.com/50915106/178155972-aaa710d4-7d14-44d4-94e1-2c60f9cf0c65.jpg)
 
-https://github.com/LivelyPuer/BudilnikTop/blob/master/Preview/ezgif-5-a787c26726.gif?raw=true
+2. Добавление виджита на главный стол:
+      +  чтобы не забыть самое главное
+      +  чтобы бысто отключить ближайший будильник
+
+
+![photo_2022-07-10_21-37-25](https://user-images.githubusercontent.com/50915106/178156099-4eca5464-5d0a-4dce-8977-398be9ebf1ab.jpg)
+![photo_2022-07-10_21-37-23](https://user-images.githubusercontent.com/50915106/178156102-662a38c8-c83b-4fd8-822d-63c436f37c9f.jpg)
+
+
+3. Прикольный квиз про покемонов когда нужно отключать сработавший будильник
+
+
+![photo_2022-07-10_21-37-22](https://user-images.githubusercontent.com/50915106/178156175-a86c5d81-f645-404c-a556-91ab4eaf51ea.jpg)
+
+
+4. И самое головыносящие это... ГОЛОСОВОЕ УПРАВЛЕНИЕ, оно может
+     + создавать будильник по фразам "**Добавь будильник на 12:00**", или "**Создай будильник на 12:00**", или "**Поставь будильник на 12:00**"
+     + выключать будильник голосом "**СТОП**"
+
+![photo_2022-07-10_21-37-19](https://user-images.githubusercontent.com/50915106/178156230-9682bfa7-5952-4e8b-80e4-a4266a8ba190.jpg)
+
+##Видеодемонстрация работы приложения
+Работоспособность будильника https://youtube.com/shorts/4Z2eoY0jDYI?feature=share
+Создание Widget https://youtube.com/shorts/WtEgi2NQMIA?feature=share
+Голосовое управление https://youtu.be/XIZrOWQD_jI
