@@ -1,13 +1,17 @@
 package com.livlypuer.budilniktop
 
+import android.app.Activity
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.speech.RecognizerIntent
+import android.speech.RecognizerResultsIntent
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -15,6 +19,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Call
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -27,6 +33,9 @@ import com.livlypuer.budilniktop.bdKotlin.DBManager
 import com.livlypuer.budilniktop.bdKotlin.TimeModel
 import com.livlypuer.budilniktop.services.MusicService
 import com.livlypuer.budilniktop.services.TimeoutService
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 
@@ -70,9 +79,58 @@ class MainActivity : ComponentActivity() {
                     backgroundColor = Color(0xff0f9d58)
                 )
             },
-            content = { MyContent() }
+            content = { MyContent() },
+            floatingActionButton = {
+                AddTweetButton()
+            }
         )
     }
+
+    @Composable
+    fun AddTweetButton() {
+        FloatingActionButton(onClick = {
+            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+            intent.putExtra(
+                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+            )
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+            resultLauncher.launch(intent)
+        }) {
+            Icon(
+                Icons.Default.Call, ""
+            )
+        }
+    }
+
+    var resultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                // There are no request codes
+                val data: Intent? = result.data
+
+                if (data != null) {
+                    val textArray = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                    val text = textArray!![0].lowercase()
+                    Log.d("MYCALL", text);
+                    val regex = """[0-9]+:[0-9]+""".toRegex()
+                    var time = "";
+                    regex.find(text)?.groupValues?.get(0)?.let { time = it.toString() }
+                    if (time != "" && ("созд" in text || "добав" in text || "ста" in text) && "будил" in text) {
+                        val formatter = DateTimeFormatter.ofPattern("H:mm")
+                            .withZone(ZoneId.systemDefault())
+                        mDBConnector!!.insertTime(
+                            TimeModel(
+                                null, LocalTime.parse(time, formatter)
+                            )
+                        )
+                        saverTimes.updateTimesList();
+                    }else if ("стоп" in text){
+                        startActivity(Intent(applicationContext, QuizeActivity::class.java))
+                    }
+                }
+            }
+        }
 
     @Composable
     fun MyContent() {
